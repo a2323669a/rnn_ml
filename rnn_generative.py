@@ -8,7 +8,7 @@ class Simple_ED:
     def __init__(self, path, encoding):
         with io.open(path, encoding=encoding) as f:
            self.text = f.read()
-        self.charset = list(set(self.text))
+        self.charset = jieba.lcut(self.text)
         self.characters = dict((i, c) for i, c in enumerate(self.charset))
         self.indexs = dict((c, i) for i, c in enumerate(self.charset))
         self.classes = len(self.charset)
@@ -99,6 +99,7 @@ if __name__ == '__main__':
     from keras.losses import categorical_crossentropy
     from keras.callbacks import ModelCheckpoint
     from keras.models import Model
+    import calls
 
     input = Input(shape=(maxlen, eder.classes))
 
@@ -113,5 +114,9 @@ if __name__ == '__main__':
                   loss = categorical_crossentropy,
                   metrics=['acc']
                   )
+
     seq = GSeq(eder, maxlen, batch_size=32)
-    model.fit_generator(seq, epochs=1, verbose=1, callbacks=[PCall(eder, maxlen)], shuffle=True, steps_per_epoch=10)
+    pcall = PCall(eder, maxlen)
+    save_call = calls.SaveCall(filepath='rnn_g.h5', period=300, mode='train_mode', max_one=False)
+
+    model.fit_generator(seq, epochs=1, verbose=1, callbacks=[pcall, save_call], shuffle=True, steps_per_epoch=10)
