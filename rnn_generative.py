@@ -8,7 +8,7 @@ class Simple_ED:
     def __init__(self, path, encoding):
         with io.open(path, encoding=encoding) as f:
            self.text = f.read()
-        self.charset = jieba.lcut(self.text)
+        self.charset = list(set(self.text))
         self.characters = dict((i, c) for i, c in enumerate(self.charset))
         self.indexs = dict((c, i) for i, c in enumerate(self.charset))
         self.classes = len(self.charset)
@@ -118,5 +118,6 @@ if __name__ == '__main__':
     seq = GSeq(eder, maxlen, batch_size=32)
     pcall = PCall(eder, maxlen)
     save_call = calls.SaveCall(filepath='rnn_g.h5', period=300, mode='train_mode', max_one=False)
+    iepoch = save_call.load(model)
 
-    model.fit_generator(seq, epochs=1, verbose=1, callbacks=[pcall, save_call], shuffle=True, steps_per_epoch=10)
+    model.fit_generator(seq, epochs=1, verbose=1, callbacks=[pcall, save_call], shuffle=True, steps_per_epoch=10, initial_epoch=iepoch)
